@@ -5,16 +5,27 @@ version: 1.0
 
 project_structure:
   src/: 源代码主目录，包含主程序入口、核心逻辑、GUI、AI集成、渗透模块和工具类。
-  src/core/: 框架核心逻辑，包括命令解析、任务调度、模块管理等。
-  src/gui/: 可视化界面相关代码，基于Qt实现，负责主窗口、可视化区和终端区。
-  src/ai/: AI集成模块，负责与外部API或本地模型交互。
-  src/modules/: 各类渗透测试模块，适配外部工具如nmap、curl等。
-  src/utils/: 工具类和辅助函数，如进程管理、字符串处理等。
-  include/: 公共头文件，供各模块引用。
-  third_party/: 第三方依赖库或集成的外部工具。
-  tests/: 单元测试代码。
-  resources/: 资源文件，如图标、配置、样式等。
-  docs/: 项目文档。
+  src/main.cpp: 程序入口点，初始化应用程序和主窗口。
+  src/core/: 框架核心逻辑模块
+    - command.h/cpp: 命令系统，负责命令解析、执行和管理
+    - database.h/cpp: 数据存储管理，使用SQLite存储命令历史、扫描结果等
+    - config_manager.h/cpp: 配置管理，处理用户设置、API密钥、工具路径等
+  src/gui/: 可视化界面相关代码，基于Qt6实现
+    - mainwindow.h/cpp: 主窗口，实现上下分屏布局（可视化区+终端区）
+  src/ai/: AI集成模块，负责与外部API或本地模型交互
+    - ai_manager.h/cpp: AI管理器，处理API调用、结果分析、智能建议
+  src/modules/: 各类渗透测试模块，适配外部工具
+    - nmap_module.h/cpp: Nmap扫描模块，封装网络扫描功能
+  src/utils/: 工具类和辅助函数
+    - process.h/cpp: 进程管理，处理外部工具调用和输出捕获
+  tests/: 单元测试代码
+    - test_main.cpp: 主要功能测试
+    - test_storage.cpp: 数据存储功能测试
+  docs/: 项目文档
+    - README.md: 项目说明文档
+    - DEVELOPMENT_PLAN.md: 开发计划和路线图
+    - DATA_STORAGE_GUIDE.md: 数据存储方案说明
+    - PACKAGING_GUIDE.md: 打包发布指南
 
 naming_conventions:
   - 头文件使用.h，源文件使用.cpp。
@@ -28,15 +39,33 @@ ai_integration:
 
 visualization_and_terminal:
   - 主界面分为上下两部分，上方为可视化内容，下方为终端（命令行交互区）。
-  - 终端区支持命令输入、日志输出、AI对话等。
+  - 终端区实现类似MindSploit>提示符的命令交互界面，支持命令输入、历史记录、自动补全。
+  - 终端显示当前环境状态（PowerShell/CMD/MindSploit环境）。
   - 可视化区用于展示网络拓扑、扫描结果、报告等。
+  - 设计支持命令行与GUI分离，便于后续Linux平台移植。
 
 modules:
   - 所有渗透测试模块位于src/modules/，每个工具一个适配器类。
   - 模块通过统一接口与核心逻辑交互。
+  - 当前已实现：NmapModule（网络扫描）。
+  - 计划实现：CurlModule、SearchsploitModule、MetasploitModule等。
+
+data_storage:
+  - 使用SQLite轻量级数据库存储结构化数据（命令历史、扫描结果、AI对话等）。
+  - 使用QSettings存储用户配置和界面设置。
+  - 使用JSON文件存储复杂配置和模板。
+  - 数据存储位置：Windows用户AppData目录，支持绿色版部署。
+
+command_system:
+  - 实现MindSploit>命令提示符，类似Metasploit的msfconsole。
+  - 支持命令历史、自动补全、命令别名。
+  - 命令与GUI分离设计，支持纯命令行模式。
+  - 集成AI助手，提供智能命令建议和结果分析。
 
 extensibility:
   - 框架采用模块化设计，便于后续扩展新工具或功能。
+  - 插件式架构，支持第三方模块开发。
 
 platform:
-  - 优先支持Windows，后续兼容Linux。 
+  - 优先支持Windows，后续兼容Linux。
+  - GUI与命令行分离，便于跨平台移植。

@@ -52,4 +52,13 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
-*~ 
+*~
+
+# Data files
+*.db
+*.sqlite
+*.sqlite3
+config.json
+settings.ini
+logs/
+reports/
