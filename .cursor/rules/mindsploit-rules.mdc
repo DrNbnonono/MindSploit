@@ -1,0 +1,48 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cursor Rules for MindSploit
+
+rule_name: mindsploit-rules
+version: 1.0
+
+project_structure:
+  src/: 源代码主目录，包含主程序入口、核心逻辑、GUI、AI集成、渗透模块和工具类。
+  src/core/: 框架核心逻辑，包括命令解析、任务调度、模块管理等。
+  src/gui/: 可视化界面相关代码，基于Qt实现，负责主窗口、可视化区和终端区。
+  src/ai/: AI集成模块，负责与外部API或本地模型交互。
+  src/modules/: 各类渗透测试模块，适配外部工具如nmap、curl等。
+  src/utils/: 工具类和辅助函数，如进程管理、字符串处理等。
+  include/: 公共头文件，供各模块引用。
+  third_party/: 第三方依赖库或集成的外部工具。
+  tests/: 单元测试代码。
+  resources/: 资源文件，如图标、配置、样式等。
+  docs/: 项目文档。
+
+naming_conventions:
+  - 头文件使用.h，源文件使用.cpp。
+  - 类名采用大驼峰（如 MainWindow），函数/变量小驼峰。
+  - 命名空间与目录结构一致。
+
+ai_integration:
+  - AI相关代码集中在src/ai/。
+  - 支持API Key配置，调用外部大模型或本地模型。
+  - AI可辅助命令解析、结果解读、自动化测试等。
+
+visualization_and_terminal:
+  - 主界面分为上下两部分，上方为可视化内容，下方为终端（命令行交互区）。
+  - 终端区支持命令输入、日志输出、AI对话等。
+  - 可视化区用于展示网络拓扑、扫描结果、报告等。
+
+modules:
+  - 所有渗透测试模块位于src/modules/，每个工具一个适配器类。
+  - 模块通过统一接口与核心逻辑交互。
+
+extensibility:
+  - 框架采用模块化设计，便于后续扩展新工具或功能。
+
+platform:
+
+  - 优先支持Windows，后续兼容Linux。 
