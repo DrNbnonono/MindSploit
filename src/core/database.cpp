@@ -18,23 +18,42 @@ Database::~Database() {
 }
 
 bool Database::initialize(const QString& dbPath) {
+    qDebug() << "Starting database initialization...";
+
+    // 检查SQLite驱动是否可用
+    if (!QSqlDatabase::isDriverAvailable("QSQLITE")) {
+        qDebug() << "SQLite driver is not available!";
+        qDebug() << "Available drivers:" << QSqlDatabase::drivers();
+        return false;
+    }
+
     // 确定数据库文件路径
     QString path = dbPath;
     if (path.isEmpty()) {
         QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        QDir().mkpath(dataDir);
+        qDebug() << "Data directory:" << dataDir;
+
+        if (!QDir().mkpath(dataDir)) {
+            qDebug() << "Failed to create data directory:" << dataDir;
+            return false;
+        }
+
         path = dataDir + "/mindsploit.db";
     }
-    
+
+    qDebug() << "Database path:" << path;
+
     // 创建SQLite连接
     m_db = QSqlDatabase::addDatabase("QSQLITE");
     m_db.setDatabaseName(path);
-    
+
     if (!m_db.open()) {
         qDebug() << "Failed to open database:" << m_db.lastError().text();
+        qDebug() << "Database error type:" << m_db.lastError().type();
+        qDebug() << "Database driver text:" << m_db.lastError().driverText();
         return false;
     }
-    
+
     qDebug() << "Database opened successfully:" << path;
     return createTables();
 }

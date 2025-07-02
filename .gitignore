@@ -5,7 +5,9 @@ release/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
-Makefile
+Makefile*
+object_script.*
+moc_predefs.h
 
 # Qt specific
 *.moc
@@ -19,12 +21,14 @@ ui_*.h
 *.o
 *.obj
 
-# Executables
-*.exe
+# Executables (keep release executable)
 *.app
 *.dll
 *.so
 *.dylib
+
+# Keep release executable but ignore debug builds
+debug/*.exe
 
 # IDE files
 .vscode/settings.json

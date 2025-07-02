@@ -1,71 +1,107 @@
 # Cursor Rules for MindSploit
 
 rule_name: mindsploit-rules
-version: 1.0
+version: 2.0
+description: "AI驱动的自主渗透测试框架，全自研内核，无外部工具依赖"
 
 project_structure:
-  src/: 源代码主目录，包含主程序入口、核心逻辑、GUI、AI集成、渗透模块和工具类。
-  src/main.cpp: 程序入口点，初始化应用程序和主窗口。
+  src/: 源代码主目录，包含主程序入口、核心逻辑、引擎系统、AI集成和工具类。
+  src/main.cpp: 程序入口点，初始化终端界面和核心组件。
   src/core/: 框架核心逻辑模块
-    - command.h/cpp: 命令系统，负责命令解析、执行和管理
+    - terminal_interface.h/cpp: 终端交互界面，专业命令行交互系统
+    - engine_manager.h/cpp: 引擎管理器，负责引擎注册、加载、执行和调度
+    - session_manager.h/cpp: 会话管理器，处理用户会话、变量和状态管理
+    - command_parser.h/cpp: 命令解析器，智能命令解析、补全和验证
     - database.h/cpp: 数据存储管理，使用SQLite存储命令历史、扫描结果等
-    - config_manager.h/cpp: 配置管理，处理用户设置、API密钥、工具路径等
-  src/gui/: 可视化界面相关代码，基于Qt6实现
-    - mainwindow.h/cpp: 主窗口，实现上下分屏布局（可视化区+终端区）
+    - config_manager.h/cpp: 配置管理，处理用户设置、API密钥、引擎配置等
+  src/engines/: 自主开发的渗透测试引擎
+    - engine_interface.h: 引擎接口基类，定义所有引擎的统一接口
+    - network/: 网络扫描引擎
+      - network_engine.h/cpp: 自主网络扫描引擎，支持主机发现、端口扫描、服务识别
   src/ai/: AI集成模块，负责与外部API或本地模型交互
     - ai_manager.h/cpp: AI管理器，处理API调用、结果分析、智能建议
-  src/modules/: 各类渗透测试模块，适配外部工具
-    - nmap_module.h/cpp: Nmap扫描模块，封装网络扫描功能
   src/utils/: 工具类和辅助函数
-    - process.h/cpp: 进程管理，处理外部工具调用和输出捕获
-  tests/: 单元测试代码
-    - test_main.cpp: 主要功能测试
-    - test_storage.cpp: 数据存储功能测试
-  docs/: 项目文档
-    - README.md: 项目说明文档
-    - DEVELOPMENT_PLAN.md: 开发计划和路线图
-    - DATA_STORAGE_GUIDE.md: 数据存储方案说明
-    - PACKAGING_GUIDE.md: 打包发布指南
+    - network_utils.h/cpp: 网络工具类，提供底层网络操作和协议支持
+  tests/: 单元测试和集成测试代码
+  docs/: 项目文档，包括开发指南、API文档、用户手册等
+  release/: 发布版本的可执行文件
+
+development_guidelines:
+  - 遵循现代C++17标准，使用智能指针、RAII原则和现代C++特性。
+  - 所有类和函数都要有清晰的注释和文档。
+  - 模块化设计，每个功能引擎独立开发和测试。
+  - 错误处理要完善，使用异常和错误码双重机制。
+  - 性能优化：异步执行、多线程处理、内存管理。
+  - 安全考虑：输入验证、权限检查、数据加密。
+  - 自主开发内核，不依赖外部工具。
 
 naming_conventions:
   - 头文件使用.h，源文件使用.cpp。
-  - 类名采用大驼峰（如 MainWindow），函数/变量小驼峰。
-  - 命名空间与目录结构一致。
+  - 类名采用大驼峰（如 NetworkEngine），函数/变量小驼峰。
+  - 命名空间与目录结构一致（MindSploit::Core, MindSploit::Network等）。
 
 ai_integration:
   - AI相关代码集中在src/ai/。
   - 支持API Key配置，调用外部大模型或本地模型。
   - AI可辅助命令解析、结果解读、自动化测试等。
 
-visualization_and_terminal:
-  - 主界面分为上下两部分，上方为可视化内容，下方为终端（命令行交互区）。
-  - 终端区实现类似MindSploit>提示符的命令交互界面，支持命令输入、历史记录、自动补全。
-  - 终端显示当前环境状态（PowerShell/CMD/MindSploit环境）。
-  - 可视化区用于展示网络拓扑、扫描结果、报告等。
-  - 设计支持命令行与GUI分离，便于后续Linux平台移植。
+terminal_interface:
+  - 专业命令行交互界面，类似Metasploit的msfconsole。
+  - 支持MindSploit>提示符的命令交互，命令历史记录、自动补全。
+  - 彩色输出支持（成功/错误/警告/信息）。
+  - 会话管理和状态维护。
+  - 信号处理优化（Ctrl+C不退出程序）。
 
-modules:
-  - 所有渗透测试模块位于src/modules/，每个工具一个适配器类。
-  - 模块通过统一接口与核心逻辑交互。
-  - 当前已实现：NmapModule（网络扫描）。
-  - 计划实现：CurlModule、SearchsploitModule、MetasploitModule等。
+engine_architecture:
+  - 所有渗透测试引擎位于src/engines/，每个引擎独立实现。
+  - 统一的EngineInterface基类，标准化参数配置、执行控制、结果处理。
+  - EngineManager负责引擎注册、发现、执行和调度。
+  - 全自主开发，无外部工具依赖。
+
+implemented_engines:
+  - ✅ NetworkEngine: 网络扫描引擎，支持主机发现、端口扫描、服务识别
+  - 🚧 VulnEngine: 漏洞扫描引擎（规划中）
+  - 🚧 WebEngine: Web应用测试引擎（规划中）
+  - 🚧 CryptoEngine: 密码攻击引擎（规划中）
+
+planned_engines:
+  - 🚧 ProtocolEngine: 网络协议分析引擎（数据包捕获、协议解析）
+  - 🚧 ExploitEngine: 漏洞利用引擎（Exploit执行、Payload生成）
+  - 🚧 PostEngine: 后渗透引擎（权限提升、横向移动）
 
 data_storage:
-  - 使用SQLite轻量级数据库存储结构化数据（命令历史、扫描结果、AI对话等）。
-  - 使用QSettings存储用户配置和界面设置。
-  - 使用JSON文件存储复杂配置和模板。
-  - 数据存储位置：Windows用户AppData目录，支持绿色版部署。
+  - ✅ SQLite轻量级数据库存储结构化数据（命令历史、扫描结果、AI对话等）
+  - ✅ QSettings存储用户配置和界面设置
+  - ✅ JSON文件存储复杂配置和模板
+  - ✅ 数据存储位置：Windows用户AppData目录，支持绿色版部署
 
-command_system:
-  - 实现MindSploit>命令提示符，类似Metasploit的msfconsole。
-  - 支持命令历史、自动补全、命令别名。
-  - 命令与GUI分离设计，支持纯命令行模式。
-  - 集成AI助手，提供智能命令建议和结果分析。
+build_system:
+  - 主要构建系统：Qt qmake (.pro文件)
+  - 备用构建系统：CMake (跨平台支持)
+  - 编译器：MinGW (Windows), GCC/Clang (Linux)
+  - 依赖库：Qt6 Core/Network/Sql, Windows网络库
 
-extensibility:
-  - 框架采用模块化设计，便于后续扩展新工具或功能。
-  - 插件式架构，支持第三方模块开发。
+testing_strategy:
+  - 单元测试：每个引擎和核心组件
+  - 集成测试：端到端功能测试
+  - 性能测试：扫描速度和准确性
+  - 安全测试：工具本身的安全性
 
-platform:
-  - 优先支持Windows，后续兼容Linux。
-  - GUI与命令行分离，便于跨平台移植。
+deployment:
+  - Windows优先支持，后续Linux兼容
+  - 绿色版部署，无需安装
+  - 依赖库打包，减少外部依赖
+  - 自动更新机制（规划中）
+
+version_control:
+  - 主分支：main（稳定版本）
+  - 开发分支：develop
+  - 功能分支：feature/*
+  - 修复分支：hotfix/*
+  - 标签：v2.0.0, v2.1.0等
+
+documentation:
+  - README.md: 项目概述和快速开始
+  - Update_log.md: 开发日志和版本历史
+  - docs/: 详细技术文档
+  - 代码注释：Doxygen格式

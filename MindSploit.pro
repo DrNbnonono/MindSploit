@@ -1,39 +1,39 @@
-QT += widgets sql network
+QT -= gui widgets
+QT += core network sql
 
-CONFIG += c++11
+CONFIG += c++17 console
+CONFIG -= app_bundle
 
 TARGET = MindSploit
 TEMPLATE = app
 
 SOURCES += \
     src/main.cpp \
-    src/gui/mainwindow.cpp \
-    src/gui/terminal_widget.cpp \
-    src/core/command.cpp \
-    src/core/module_interface.cpp \
-    src/core/module_manager.cpp \
+    src/core/terminal_interface.cpp \
+    src/core/engine_manager.cpp \
+    src/core/session_manager.cpp \
+    src/core/command_parser.cpp \
+    src/engines/network/network_engine.cpp \
     src/ai/ai_manager.cpp \
-    src/modules/nmap/nmap_module.cpp \
-    src/modules/searchsploit/searchsploit_module.cpp \
-    src/modules/curl/curl_module.cpp \
-    src/modules/portscan/portscan_module.cpp \
-    src/utils/process.cpp \
+    src/utils/network_utils.cpp \
     src/core/database.cpp \
     src/core/config_manager.cpp
 
 HEADERS += \
-    src/gui/mainwindow.h \
-    src/gui/terminal_widget.h \
-    src/core/command.h \
-    src/core/module_interface.h \
-    src/core/module_manager.h \
+    src/core/terminal_interface.h \
+    src/core/engine_manager.h \
+    src/core/session_manager.h \
+    src/core/command_parser.h \
+    src/engines/engine_interface.h \
+    src/engines/network/network_engine.h \
     src/ai/ai_manager.h \
-    src/modules/nmap/nmap_module.h \
-    src/modules/searchsploit/searchsploit_module.h \
-    src/modules/curl/curl_module.h \
-    src/modules/portscan/portscan_module.h \
-    src/utils/process.h \
+    src/utils/network_utils.h \
     src/core/database.h \
     src/core/config_manager.h
 
 INCLUDEPATH += src
+
+# Windows特定库
+win32 {
+    LIBS += -lws2_32 -liphlpapi
+}
