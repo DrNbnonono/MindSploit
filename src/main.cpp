@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include <iostream>
 #include <string>
 #include <memory>
@@ -16,6 +17,7 @@
 #include "core/terminal_interface.h"
 #include "core/engine_manager.h"
 #include "core/session_manager.h"
+#include "core/database.h"
 
 // 全局变量用于信号处理
 std::unique_ptr<MindSploit::Core::TerminalInterface> g_terminal;
@@ -78,6 +80,10 @@ void showBanner() {
 }
 
 int main(int argc, char *argv[]) {
+    // 初始化Qt应用程序 (SQL模块需要)
+    QCoreApplication app(argc, argv);
+    // 不启动事件循环，我们使用自己的主循环
+
     try {
         // 设置控制台
         setupConsole();
@@ -88,6 +94,26 @@ int main(int argc, char *argv[]) {
 
         // 显示启动横幅
         showBanner();
+
+        // 初始化数据库
+        std::cout << "[*] 正在初始化数据库..." << std::endl;
+        auto& database = MindSploit::Core::Database::instance();
+        auto dbResult = database.initializeWithUserChoice();
+
+        if (!dbResult.success) {
+            std::cerr << "\n[!] 数据库初始化失败: " << dbResult.message.toStdString() << std::endl;
+            std::cerr << "[!] 程序无法继续运行，请解决数据库问题后重新启动" << std::endl;
+            return -1;
+        }
+
+        // 显示数据库状态
+        if (dbResult.noDatabaseMode) {
+            std::cout << "\n[!] 运行在无数据库模式下" << std::endl;
+            std::cout << "[!] 所有操作记录将不会被保存" << std::endl;
+        } else {
+            std::cout << "\n[+] 数据库连接成功" << std::endl;
+            std::cout << "[+] 操作记录将被持久化保存" << std::endl;
+        }
 
         // 初始化核心组件
         auto engineManager = std::make_unique<MindSploit::Core::EngineManager>();

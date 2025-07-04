@@ -224,6 +224,13 @@ void EngineManager::registerBuiltinEngines() {
     // 注册网络引擎
     auto networkFactory = std::make_unique<EngineFactoryTemplate<Network::NetworkEngine>>();
     registerEngine("network", std::move(networkFactory));
+
+    // 自动加载网络引擎
+    if (!loadEngine("network")) {
+        std::cerr << "[!] 警告: 网络引擎加载失败" << std::endl;
+    } else {
+        std::cout << "[+] 网络引擎加载成功" << std::endl;
+    }
 }
 
 void EngineManager::buildCommandRouting() {

@@ -11,9 +11,11 @@ namespace MindSploit::Core {
 // 命令类型枚举
 enum class CommandType {
     BUILTIN,        // 内置命令 (help, version, set, show等)
+    MODULE,         // 模块命令 (use, back, info, search等)
     ENGINE,         // 引擎命令 (discover, scan, vuln等)
     AI,             // AI命令 (ai, analyze, suggest等)
-    SESSION,        // 会话命令 (sessions, use, back等)
+    SESSION,        // 会话命令 (sessions, jobs等)
+    CONTEXT,        // 上下文命令 (run, exploit, check等)
     UNKNOWN         // 未知命令
 };
 
@@ -103,21 +105,37 @@ public:
     std::vector<std::string> getHistory() const;
     std::string getHistoryItem(int index) const; // 负数表示从末尾开始
     void clearHistory();
-    
+
     // 别名管理
     void addAlias(const std::string& alias, const std::string& command);
     void removeAlias(const std::string& alias);
     std::string resolveAlias(const std::string& input);
     std::map<std::string, std::string> getAllAliases() const;
 
+    // 上下文管理
+    void setCurrentContext(const std::string& context);
+    std::string getCurrentContext() const;
+    void pushContext(const std::string& context);
+    void popContext();
+    bool isInModuleContext() const;
+    bool isInAIContext() const;
+
 private:
     // 内部解析方法
     std::vector<std::string> tokenize(const std::string& input);
-    std::map<std::string, std::string> parseParameters(const std::vector<std::string>& tokens, 
+    std::map<std::string, std::string> parseParameters(const std::vector<std::string>& tokens,
                                                        size_t startIndex);
     bool validateParameter(const std::string& value, ParameterType type);
     std::string normalizeCommand(const std::string& command);
-    
+
+    // 命令定义辅助方法
+    void defineCommand(const std::string& name, const std::string& description,
+                      const std::string& usage, const std::vector<std::string>& aliases,
+                      CommandType type);
+    void defineCommand(const std::string& name, const std::string& description,
+                      const std::string& usage, const std::vector<std::string>& aliases,
+                      CommandType type, const std::string& engineName);
+
     // 工具方法
     bool isValidIPAddress(const std::string& ip);
     bool isValidPortRange(const std::string& portRange);
@@ -130,10 +148,14 @@ private:
     std::map<std::string, std::string> m_aliases;
     std::vector<std::string> m_history;
     size_t m_maxHistorySize = 1000;
-    
+
+    // 上下文管理
+    std::vector<std::string> m_contextStack;
+    std::string m_currentContext;
+
     // 内置命令定义
     void defineBuiltinCommands();
-    
+
     // 常用命令模板
     static const std::vector<CommandDef> BUILTIN_COMMANDS;
 };

@@ -66,3 +66,27 @@ config.json
 settings.ini
 logs/
 reports/
+
+# Test files (temporary)
+test_*.cpp
+test_*.exe
+simple_test.*
+test_commands.txt
+test_network.*
+test_engine_manager.*
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Windows specific
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# Network scan results
+scan_results/
+*.xml
+*.json

@@ -166,6 +166,10 @@ void CommandParser::addAlias(const std::string& alias, const std::string& comman
     m_aliases[alias] = command;
 }
 
+void CommandParser::removeAlias(const std::string& alias) {
+    m_aliases.erase(alias);
+}
+
 std::string CommandParser::resolveAlias(const std::string& input) {
     auto tokens = tokenize(input);
     if (tokens.empty()) {
@@ -314,36 +318,113 @@ bool CommandParser::isValidURL(const std::string& url) {
 }
 
 void CommandParser::defineBuiltinCommands() {
-    // 定义内置命令
-    CommandDef helpCmd;
-    helpCmd.name = "help";
-    helpCmd.description = "显示帮助信息";
-    helpCmd.usage = "help [command]";
-    helpCmd.type = CommandType::BUILTIN;
-    registerCommand(helpCmd);
-    
-    CommandDef versionCmd;
-    versionCmd.name = "version";
-    versionCmd.description = "显示版本信息";
-    versionCmd.usage = "version";
-    versionCmd.type = CommandType::BUILTIN;
-    registerCommand(versionCmd);
-    
-    CommandDef clearCmd;
-    clearCmd.name = "clear";
-    clearCmd.description = "清空终端";
-    clearCmd.usage = "clear";
-    clearCmd.aliases = {"cls"};
-    clearCmd.type = CommandType::BUILTIN;
-    registerCommand(clearCmd);
-    
-    CommandDef exitCmd;
-    exitCmd.name = "exit";
-    exitCmd.description = "退出程序";
-    exitCmd.usage = "exit";
-    exitCmd.aliases = {"quit"};
-    exitCmd.type = CommandType::BUILTIN;
-    registerCommand(exitCmd);
+    // === 系统控制命令 ===
+    defineCommand("help", "显示帮助信息", "help [command/module]", {}, CommandType::BUILTIN);
+    defineCommand("version", "显示版本信息", "version", {}, CommandType::BUILTIN);
+    defineCommand("exit", "退出程序", "exit", {"quit"}, CommandType::BUILTIN);
+    defineCommand("clear", "清空终端", "clear", {"cls"}, CommandType::BUILTIN);
+    defineCommand("banner", "显示程序横幅", "banner", {}, CommandType::BUILTIN);
+    defineCommand("history", "显示命令历史", "history [count]", {}, CommandType::BUILTIN);
+
+    // === 模块管理命令 ===
+    defineCommand("use", "使用指定模块", "use <module_path>", {}, CommandType::MODULE);
+    defineCommand("back", "返回上一级", "back", {}, CommandType::MODULE);
+    defineCommand("info", "显示模块信息", "info [module]", {}, CommandType::MODULE);
+    defineCommand("search", "搜索模块", "search <keyword>", {}, CommandType::MODULE);
+    defineCommand("show", "显示信息", "show <type>", {}, CommandType::MODULE);
+    defineCommand("reload", "重新加载模块", "reload [module]", {}, CommandType::MODULE);
+
+    // === 配置管理命令 ===
+    defineCommand("set", "设置选项", "set <option> <value>", {}, CommandType::BUILTIN);
+    defineCommand("unset", "取消设置", "unset <option>", {}, CommandType::BUILTIN);
+    defineCommand("setg", "设置全局选项", "setg <option> <value>", {}, CommandType::BUILTIN);
+    defineCommand("unsetg", "取消全局设置", "unsetg <option>", {}, CommandType::BUILTIN);
+    defineCommand("save", "保存配置", "save [filename]", {}, CommandType::BUILTIN);
+    defineCommand("load", "加载配置", "load <filename>", {}, CommandType::BUILTIN);
+
+    // === 会话管理命令 ===
+    defineCommand("sessions", "显示会话列表", "sessions", {}, CommandType::SESSION);
+    defineCommand("session", "切换会话", "session <id>", {}, CommandType::SESSION);
+    defineCommand("background", "后台运行", "background", {"bg"}, CommandType::SESSION);
+    defineCommand("jobs", "显示任务列表", "jobs", {}, CommandType::SESSION);
+    defineCommand("kill", "终止任务", "kill <job_id>", {}, CommandType::SESSION);
+
+    // === 上下文命令 ===
+    defineCommand("run", "执行模块", "run", {"exploit"}, CommandType::CONTEXT);
+    defineCommand("check", "检查目标", "check", {}, CommandType::CONTEXT);
+    defineCommand("rexploit", "重新执行", "rexploit", {"rerun"}, CommandType::CONTEXT);
+    defineCommand("generate", "生成载荷", "generate", {}, CommandType::CONTEXT);
+
+    // === AI命令 ===
+    defineCommand("ai", "AI交互模式", "ai [command]", {}, CommandType::AI);
+
+    // === 网络扫描命令 ===
+    defineCommand("discover", "主机发现", "discover <target>", {"ping"}, CommandType::ENGINE, "network");
+    defineCommand("scan", "端口扫描", "scan <target> [ports=<ports>]", {"portscan"}, CommandType::ENGINE, "network");
+    defineCommand("service", "服务识别", "service <target>", {"svc"}, CommandType::ENGINE, "network");
+    defineCommand("os", "操作系统识别", "os <target>", {"osdetect"}, CommandType::ENGINE, "network");
+
+    // === 别名管理 ===
+    defineCommand("alias", "创建别名", "alias <name> <command>", {}, CommandType::BUILTIN);
+    defineCommand("unalias", "删除别名", "unalias <name>", {}, CommandType::BUILTIN);
+}
+
+// 辅助方法来简化命令定义
+void CommandParser::defineCommand(const std::string& name, const std::string& description,
+                                 const std::string& usage, const std::vector<std::string>& aliases,
+                                 CommandType type) {
+    CommandDef cmd;
+    cmd.name = name;
+    cmd.description = description;
+    cmd.usage = usage;
+    cmd.aliases = aliases;
+    cmd.type = type;
+    registerCommand(cmd);
+}
+
+// 重载版本，支持引擎名称
+void CommandParser::defineCommand(const std::string& name, const std::string& description,
+                                 const std::string& usage, const std::vector<std::string>& aliases,
+                                 CommandType type, const std::string& engineName) {
+    CommandDef cmd;
+    cmd.name = name;
+    cmd.description = description;
+    cmd.usage = usage;
+    cmd.aliases = aliases;
+    cmd.type = type;
+    cmd.engineName = engineName;
+    registerCommand(cmd);
+}
+
+// 上下文管理方法实现
+void CommandParser::setCurrentContext(const std::string& context) {
+    m_currentContext = context;
+}
+
+std::string CommandParser::getCurrentContext() const {
+    return m_currentContext;
+}
+
+void CommandParser::pushContext(const std::string& context) {
+    m_contextStack.push_back(m_currentContext);
+    m_currentContext = context;
+}
+
+void CommandParser::popContext() {
+    if (!m_contextStack.empty()) {
+        m_currentContext = m_contextStack.back();
+        m_contextStack.pop_back();
+    } else {
+        m_currentContext.clear();
+    }
+}
+
+bool CommandParser::isInModuleContext() const {
+    return !m_currentContext.empty() && m_currentContext != "ai";
+}
+
+bool CommandParser::isInAIContext() const {
+    return m_currentContext == "ai";
 }
 
 } // namespace MindSploit::Core

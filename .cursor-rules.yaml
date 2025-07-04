@@ -1,7 +1,7 @@
 # Cursor Rules for MindSploit
 
 rule_name: mindsploit-rules
-version: 2.0
+version: 2.0.6
 description: "AI驱动的自主渗透测试框架，全自研内核，无外部工具依赖"
 
 project_structure:
@@ -12,7 +12,7 @@ project_structure:
     - engine_manager.h/cpp: 引擎管理器，负责引擎注册、加载、执行和调度
     - session_manager.h/cpp: 会话管理器，处理用户会话、变量和状态管理
     - command_parser.h/cpp: 命令解析器，智能命令解析、补全和验证
-    - database.h/cpp: 数据存储管理，使用SQLite存储命令历史、扫描结果等
+    - database.h/cpp: 数据存储管理，使用MySQL存储命令历史、扫描结果等
     - config_manager.h/cpp: 配置管理，处理用户设置、API密钥、引擎配置等
   src/engines/: 自主开发的渗透测试引擎
     - engine_interface.h: 引擎接口基类，定义所有引擎的统一接口
@@ -50,7 +50,7 @@ terminal_interface:
   - 支持MindSploit>提示符的命令交互，命令历史记录、自动补全。
   - 彩色输出支持（成功/错误/警告/信息）。
   - 会话管理和状态维护。
-  - 信号处理优化（Ctrl+C不退出程序）。
+  - 信号处理优化（Ctrl+C不退出程序，优雅中断处理）。
 
 engine_architecture:
   - 所有渗透测试引擎位于src/engines/，每个引擎独立实现。
@@ -70,10 +70,11 @@ planned_engines:
   - 🚧 PostEngine: 后渗透引擎（权限提升、横向移动）
 
 data_storage:
-  - ✅ SQLite轻量级数据库存储结构化数据（命令历史、扫描结果、AI对话等）
+  - ✅ MySQL企业级数据库存储结构化数据（命令历史、扫描结果、AI对话等）
+  - ✅ 无数据库模式支持，MySQL不可用时仍可正常运行
+  - ✅ 自动化数据库管理（检测、创建、初始化）
   - ✅ QSettings存储用户配置和界面设置
   - ✅ JSON文件存储复杂配置和模板
-  - ✅ 数据存储位置：Windows用户AppData目录，支持绿色版部署
 
 build_system:
   - 主要构建系统：Qt qmake (.pro文件)

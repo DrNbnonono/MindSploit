@@ -69,18 +69,49 @@ private:
     bool processCommand(const std::string& input);
     bool executeBuiltinCommand(const std::string& command, const std::vector<std::string>& args);
     
-    // 内置命令实现
+    // === 系统控制命令 ===
     bool cmdHelp(const std::vector<std::string>& args);
     bool cmdVersion(const std::vector<std::string>& args);
     bool cmdClear(const std::vector<std::string>& args);
-    bool cmdHistory(const std::vector<std::string>& args);
     bool cmdBanner(const std::vector<std::string>& args);
-    bool cmdSet(const std::vector<std::string>& args);
-    bool cmdShow(const std::vector<std::string>& args);
-    bool cmdSessions(const std::vector<std::string>& args);
+    bool cmdHistory(const std::vector<std::string>& args);
+    bool cmdExit(const std::vector<std::string>& args);
+
+    // === 模块管理命令 ===
     bool cmdUse(const std::vector<std::string>& args);
     bool cmdBack(const std::vector<std::string>& args);
-    bool cmdExit(const std::vector<std::string>& args);
+    bool cmdInfo(const std::vector<std::string>& args);
+    bool cmdSearch(const std::vector<std::string>& args);
+    bool cmdShow(const std::vector<std::string>& args);
+    bool cmdReload(const std::vector<std::string>& args);
+
+    // === 配置管理命令 ===
+    bool cmdSet(const std::vector<std::string>& args);
+    bool cmdUnset(const std::vector<std::string>& args);
+    bool cmdSetGlobal(const std::vector<std::string>& args);
+    bool cmdUnsetGlobal(const std::vector<std::string>& args);
+    bool cmdSave(const std::vector<std::string>& args);
+    bool cmdLoad(const std::vector<std::string>& args);
+
+    // === 会话管理命令 ===
+    bool cmdSessions(const std::vector<std::string>& args);
+    bool cmdSession(const std::vector<std::string>& args);
+    bool cmdBackground(const std::vector<std::string>& args);
+    bool cmdJobs(const std::vector<std::string>& args);
+    bool cmdKill(const std::vector<std::string>& args);
+
+    // === 上下文命令 ===
+    bool cmdRun(const std::vector<std::string>& args);
+    bool cmdCheck(const std::vector<std::string>& args);
+    bool cmdRexploit(const std::vector<std::string>& args);
+    bool cmdGenerate(const std::vector<std::string>& args);
+
+    // === AI命令 ===
+    bool cmdAI(const std::vector<std::string>& args);
+
+    // === 别名管理命令 ===
+    bool cmdAlias(const std::vector<std::string>& args);
+    bool cmdUnalias(const std::vector<std::string>& args);
     
     // 工具方法
     std::vector<std::string> parseInput(const std::string& input);
